@@ -9,6 +9,10 @@ import { BsGithub, BsGoogle } from 'react-icons/bs'
 import Input from "@/app/components/inputs/input"
 import Button from "@/app/components/Button"
 import AuthSocialButton from "./AuthSocialButton"
+import axios from "axios"
+import { signIn } from 'next-auth/react'
+
+import { toast } from 'react-hot-toast'
 
 type Variant = 'LOGIN' | 'REGISTER'
 
@@ -44,16 +48,41 @@ const AuthForm = () => {
     setIsLoading(true)
 
     if (variant == 'REGISTER') {
-
+      axios.post('api/register', data)
+        .catch(() => toast.error('Something went wrong!'))
+        .finally(() => setIsLoading(false))
     }
 
     if (variant == 'LOGIN') {
-
+      signIn('credentials', {
+        ...data,
+        redirect: false
+      })
+        .then((callback) => {
+          if (callback?.error) {
+            toast.error('Invalid credentials')
+          }
+          if (callback?.ok && !callback?.error) {
+            toast.success('Logged In')
+          }
+        })
+        .finally(() => setIsLoading(false))
     }
   }
 
   const socialActions = (action: string) => {
     setIsLoading(true)
+
+    signIn(action, { redirect: false})
+    .then((callback) => {
+      if(callback?.error){
+        toast.error('Invalid Credentials')
+      }
+      if (callback?.ok && !callback?.error) {
+        toast.success('Logged In')
+      }
+    })
+    .finally(() => setIsLoading(false))
   }
   return (
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -68,7 +97,7 @@ const AuthForm = () => {
               id="name"
               register={register}
               errors={errors}
-              disabled={false}
+              disabled={isLoading}
               type="text"
             />
           )}
@@ -78,7 +107,7 @@ const AuthForm = () => {
             id="email"
             register={register}
             errors={errors}
-            disabled={false}
+            disabled={isLoading}
             type="email"
           />
 
@@ -87,7 +116,7 @@ const AuthForm = () => {
             id="password"
             register={register}
             errors={errors}
-            disabled={false}
+            disabled={isLoading}
             type="password"
           />
 
@@ -136,7 +165,7 @@ const AuthForm = () => {
           </div>
 
           <div onClick={toggleVariant}
-          className="underline cursor-pointer">
+            className="underline cursor-pointer">
             {variant == 'LOGIN' ? 'Create an account' : 'Log in'}
           </div>
         </div>
