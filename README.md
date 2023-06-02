@@ -1,4 +1,4 @@
-https://youtu.be/PGPGcKBpAk8?t=3457
+https://youtu.be/PGPGcKBpAk8?t=6815
 
 # Real-Time Messenger Clone: Next.js 13, React, Tailwind, Prisma, MongoDB, NextAuth, Pusher (2023)
 
